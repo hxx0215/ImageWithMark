@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B931CE5E1AD62278008CF3C0 /* ImageMarkView.m in Sources */ = {isa = PBXBuildFile; fileRef = B931CE5D1AD62278008CF3C0 /* ImageMarkView.m */; };
 		B9E1FDCE1AD5309A007552C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B9E1FDCD1AD5309A007552C4 /* main.m */; };
 		B9E1FDD11AD5309A007552C4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9E1FDD01AD5309A007552C4 /* AppDelegate.m */; };
 		B9E1FDD41AD5309B007552C4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9E1FDD31AD5309B007552C4 /* ViewController.m */; };
@@ -27,6 +28,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B931CE5C1AD62277008CF3C0 /* ImageMarkView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageMarkView.h; sourceTree = "<group>"; };
+		B931CE5D1AD62278008CF3C0 /* ImageMarkView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageMarkView.m; sourceTree = "<group>"; };
 		B9E1FDC81AD5309A007552C4 /* ImageWithMark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageWithMark.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9E1FDCC1AD5309A007552C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9E1FDCD1AD5309A007552C4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -85,6 +88,8 @@
 				B9E1FDD01AD5309A007552C4 /* AppDelegate.m */,
 				B9E1FDD21AD5309A007552C4 /* ViewController.h */,
 				B9E1FDD31AD5309B007552C4 /* ViewController.m */,
+				B931CE5C1AD62277008CF3C0 /* ImageMarkView.h */,
+				B931CE5D1AD62278008CF3C0 /* ImageMarkView.m */,
 				B9E1FDD51AD5309B007552C4 /* Main.storyboard */,
 				B9E1FDD81AD5309B007552C4 /* Images.xcassets */,
 				B9E1FDDA1AD5309B007552C4 /* LaunchScreen.xib */,
@@ -222,6 +227,7 @@
 				B9E1FDD41AD5309B007552C4 /* ViewController.m in Sources */,
 				B9E1FDD11AD5309A007552C4 /* AppDelegate.m in Sources */,
 				B9E1FDCE1AD5309A007552C4 /* main.m in Sources */,
+				B931CE5E1AD62278008CF3C0 /* ImageMarkView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,6 +424,7 @@
 				B9E1FDED1AD5309B007552C4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B9E1FDEE1AD5309B007552C4 /* Build configuration list for PBXNativeTarget "ImageWithMarkTests" */ = {
 			isa = XCConfigurationList;
@@ -426,6 +433,7 @@
 				B9E1FDF01AD5309B007552C4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
