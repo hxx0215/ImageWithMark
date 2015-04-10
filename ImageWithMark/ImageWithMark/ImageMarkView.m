@@ -8,11 +8,14 @@
 
 #import "ImageMarkView.h"
 @interface ImageMarkView()
+@property (nonatomic, retain)NSMutableArray *historyPoints;
+@property (nonatomic, retain)NSMutableArray *historyPath;
 @property (nonatomic, retain)NSMutableArray *currentLinePoint;
 @property (nonatomic, assign)CGMutablePathRef path;
 @property(nonatomic, assign) CGPoint currentPoint;
 @property(nonatomic, assign) CGPoint previousPoint1;
 @property(nonatomic, assign) CGPoint previousPoint2;
+@property (nonatomic, retain)UIImage *image;
 @end
 @implementation ImageMarkView
 static CGPoint midPoint(CGPoint p1,CGPoint p2){
@@ -39,11 +42,67 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
     CGPathRelease(subPath);
     return bounds;
 }
-
+- (void)updateCacheImage:(BOOL)flag{
+    UIGraphicsBeginImageContextWithOptions(self.bounds.size, NO, 0.0);
+    CGFloat lineWidth = 3.0;
+    UIColor *lineColor = [UIColor redColor];
+    CGFloat lineOpacity = 1.0;
+    if (flag) {
+        
+        self.image = nil;
+        
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSetLineCap(context, kCGLineCapRound);
+        CGContextSetLineJoin(context, kCGLineJoinRound);
+        
+        CGContextSetLineWidth(context, lineWidth);
+        const CGFloat* component = CGColorGetComponents(lineColor.CGColor);
+        if (component) {
+            CGContextSetRGBStrokeColor(context, component[0], component[1], component[2], lineOpacity);
+        }
+        else
+        {
+            CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
+        }
+        
+        for (NSValue *val in self.historyPath) {
+            CGPathRef tPath;
+            [val getValue:&tPath];
+            CGContextAddPath(context, tPath);
+        }
+        CGContextStrokePath(context);
+        
+    } else {
+        
+        [self.image drawAtPoint:CGPointZero];
+        
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSetLineCap(context, kCGLineCapRound);
+        CGContextSetLineJoin(context, kCGLineJoinRound);
+        
+        CGContextSetLineWidth(context, lineWidth);
+        const CGFloat* component = CGColorGetComponents(lineColor.CGColor);
+        if (component) {
+            CGContextSetRGBStrokeColor(context, component[0], component[1], component[2], lineOpacity);
+        }
+        else
+        {
+            CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
+        }
+        
+        CGContextAddPath(context, _path);
+        CGContextStrokePath(context);
+    }
+    
+    // store the image
+    self.image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+}
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect {
     // Drawing code
+    [self.image drawInRect:self.bounds];
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetLineCap(context, kCGLineCapRound);
     CGContextSetLineJoin(context, kCGLineJoinRound);
@@ -85,6 +144,12 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
     [self setNeedsDisplayInRect:drawBox];
 }
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+    NSMutableArray *temp = [[[NSMutableArray alloc] initWithArray:self.currentLinePoint copyItems:YES] autorelease];
+    [self.historyPoints addObject:temp];
+    [self.currentLinePoint removeAllObjects];
+    CGPathRef tPath = CGPathCreateCopy(self.path);
+    [self.historyPath addObject:[NSValue value:&tPath withObjCType:@encode(CGPathRef)]];
+    [self updateCacheImage:NO];
     CGPathRelease(self.path);
     self.path = nil;
 }
