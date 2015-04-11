@@ -64,6 +64,7 @@
     self.markView.hidden = NO;
 }
 - (void)editWithText: (id)sender{
+    self.waterView.frame = self.view.bounds;
     self.waterView.hidden = NO;
 }
 #pragma mark - ActionSheetDelegate
