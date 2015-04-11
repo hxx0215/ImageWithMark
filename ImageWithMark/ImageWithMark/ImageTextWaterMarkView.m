@@ -17,6 +17,7 @@
 @property (nonatomic, assign)CGFloat fontSize;
 @property (nonatomic, assign)CGAffineTransform rotateBeginTransform;
 @property (nonatomic, assign)CGFloat rotateBeginAngle;
+@property (nonatomic, assign)CGFloat moveBeginFontSize;
 @end
 @implementation ImageTextWaterMarkView
 static CGFloat distance(CGPoint a, CGPoint b){
@@ -37,6 +38,7 @@ static CGFloat distance(CGPoint a, CGPoint b){
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.textField.layer.borderWidth = 1.0;
         self.textField.layer.borderColor = [UIColor redColor].CGColor;
+        self.textField.clipsToBounds = YES;
         self.textField.delegate = self;
         self.rotateView.userInteractionEnabled = YES;
         UIPanGestureRecognizer *moveGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(moveGesture:)];
@@ -79,14 +81,22 @@ static CGFloat distance(CGPoint a, CGPoint b){
         self.moveBeginPoint = [recognizer locationInView:self];
         self.moveBeginCenter = self.textField.center;
         self.rotateBeginTransform = self.textField.transform;
-        self.rotateBeginAngle = atan2(self.moveBeginPoint.y- self.center.y, self.moveBeginPoint.x - self.center.x) - atan2(self.transform.b, self.transform.a);
+        self.rotateBeginAngle = atan2(self.moveBeginPoint.y- self.textField.center.y, self.moveBeginPoint.x - self.textField.center.x) ;
         self.moveRotateBeginCenter = self.rotateView.center;
+        self.moveBeginFontSize = self.textField.font.pointSize;
     }
     if (recognizer.state == UIGestureRecognizerStateChanged){
         CGPoint current = [recognizer locationInView:self];
         CGFloat scale = distance(current, self.moveBeginCenter) / distance(self.moveBeginPoint, self.moveBeginCenter);
         CGAffineTransform transform = self.rotateBeginTransform;
-        transform = CGAffineTransformScale(transform, scale, scale);
+//        transform = CGAffineTransformScale(transform, scale, scale);
+        self.textField.font = [UIFont fontWithName:@"Helvetica" size:self.moveBeginFontSize*scale];
+        self.fontSize = self.textField.font.pointSize;
+        [self.textField sizeToFit];
+        CGRect bounds = self.textField.bounds;
+        bounds.size.width = [self adaptWidthWithContent:self.textField.text];
+        self.textField.bounds = bounds;
+        NSLog(@"%@",NSStringFromCGPoint(self.textField.center));
         CGFloat angle = atan2(current.y - self.moveBeginCenter.y, current.x - self.moveBeginCenter.x);
         transform = CGAffineTransformRotate(transform, angle - self.rotateBeginAngle);
         self.textField.transform = transform;
@@ -99,6 +109,15 @@ static CGFloat distance(CGPoint a, CGPoint b){
 //        self.rotateView.center = CGPointMake(self.moveBeginCenter.x + scaleVector.x, self.moveBeginCenter.y + scaleVector.y);
         self.rotateView.center = [self rightBottom:self.textField];
     }
+}
+- (CGFloat)adaptWidthWithContent:(NSString *)str{
+    if (!str || [str isEqualToString:@""])
+        str = NSLocalizedString(@"输入水印内容", nil);
+    UIFont *font = [UIFont fontWithName:@"Helvetica" size:self.fontSize];
+    self.textField.font = font;
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:str attributes:@{NSFontAttributeName : font}];
+    CGRect rectSize = [attributedString boundingRectWithSize:CGSizeMake(0, 0) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
+    return rectSize.size.width;
 }
 - (void)resizeWithContent:(NSString*)str{
     if (!str || [str isEqualToString:@""])
