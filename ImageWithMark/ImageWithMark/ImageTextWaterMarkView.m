@@ -39,6 +39,7 @@ static CGFloat distance(CGPoint a, CGPoint b){
         self.textField.layer.borderWidth = 1.0;
         self.textField.layer.borderColor = [UIColor redColor].CGColor;
         self.textField.clipsToBounds = YES;
+        self.textField.layer.shouldRasterize = YES;
         self.textField.delegate = self;
         self.rotateView.userInteractionEnabled = YES;
         UIPanGestureRecognizer *moveGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(moveGesture:)];
