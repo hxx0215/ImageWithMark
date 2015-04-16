@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface ImageMarkView : UIView
-
+@property (nonatomic, assign)CGSize imageScale;
 @end

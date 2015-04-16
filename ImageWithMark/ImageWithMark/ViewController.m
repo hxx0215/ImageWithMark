@@ -32,6 +32,7 @@
     self.navigationItem.leftBarButtonItems = @[penItem,textItem];
     self.navigationController.navigationBar.translucent = NO;
     self.markView = [[ImageMarkView alloc] init];
+    self.markView.imageScale = CGSizeMake(1.0, 1.0);
     [self.view addSubview:self.markView];
     self.waterView = [[ImageTextWaterMarkView alloc] init];
     [self.view addSubview:self.waterView];

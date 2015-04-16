@@ -21,10 +21,14 @@
 static CGPoint midPoint(CGPoint p1,CGPoint p2){
     return CGPointMake((p1.x + p2.x)*0.5, (p1.y+p2.y)*0.5);
 }
+static CGPoint pointApplytoScale(CGPoint p,CGSize s){
+    return CGPointMake(p.x / s.width, p.y / s.height);
+}
 - (instancetype)init{
     if (self=[super init]){
         self.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.3];
         _currentLinePoint = [NSMutableArray new];
+        _imageScale = CGSizeMake(1.0, 1.0);
     }
     return self;
 }
@@ -52,6 +56,7 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
         self.image = nil;
         
         CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextScaleCTM(context, self.imageScale.width, self.imageScale.height);
         CGContextSetLineCap(context, kCGLineCapRound);
         CGContextSetLineJoin(context, kCGLineJoinRound);
         
@@ -65,10 +70,8 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
             CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
         }
         
-        for (NSValue *val in self.historyPath) {
-            CGPathRef tPath;
-            [val getValue:&tPath];
-            CGContextAddPath(context, tPath);
+        for (UIBezierPath *path in self.historyPath) {
+            CGContextAddPath(context, path.CGPath);
         }
         CGContextStrokePath(context);
         
@@ -77,6 +80,7 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
         [self.image drawAtPoint:CGPointZero];
         
         CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextScaleCTM(context, self.imageScale.width, self.imageScale.height);
         CGContextSetLineCap(context, kCGLineCapRound);
         CGContextSetLineJoin(context, kCGLineJoinRound);
         
@@ -104,6 +108,7 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
     // Drawing code
     [self.image drawInRect:self.bounds];
     CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextScaleCTM(context, self.imageScale.width, self.imageScale.height);
     CGContextSetLineCap(context, kCGLineCapRound);
     CGContextSetLineJoin(context, kCGLineJoinRound);
     CGContextSetLineWidth(context, 3.0);
@@ -128,13 +133,21 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
     UITouch *touch = [touches anyObject];
     self.previousPoint1 = [touch previousLocationInView:self];
     self.currentPoint = [touch locationInView:self];
+    self.previousPoint1 = pointApplytoScale(self.previousPoint1, self.imageScale);
+    self.currentPoint = pointApplytoScale(self.currentPoint, self.imageScale);
 }
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
     UITouch *touch = [touches anyObject];
     self.currentPoint = [touch locationInView:self];
+    self.currentPoint = pointApplytoScale(self.currentPoint, self.imageScale);
     self.previousPoint2 = self.previousPoint1;
     self.previousPoint1 = [touch previousLocationInView:self];
+    self.previousPoint1 = pointApplytoScale(self.previousPoint1, self.imageScale);
     CGRect bounds = [self addPathPreviousWithSecondPoint:self.previousPoint2 FirstPoint:self.previousPoint1 CurrentPoint:self.currentPoint];
+    bounds.origin.x *= self.imageScale.width;
+    bounds.origin.y *= self.imageScale.height;
+    bounds.size.width *= self.imageScale.width;
+    bounds.size.height *= self.imageScale.height;
     CGRect drawBox = bounds;
     CGFloat lineWidth = 3.0;
     drawBox.origin.x -= lineWidth * 2.0;
@@ -147,8 +160,10 @@ static CGPoint midPoint(CGPoint p1,CGPoint p2){
     NSMutableArray *temp = [[[NSMutableArray alloc] initWithArray:self.currentLinePoint copyItems:YES] autorelease];
     [self.historyPoints addObject:temp];
     [self.currentLinePoint removeAllObjects];
-    CGPathRef tPath = CGPathCreateCopy(self.path);
-    [self.historyPath addObject:[NSValue value:&tPath withObjCType:@encode(CGPathRef)]];
+//    CGPathRef tPath = CGPathCreateCopy(self.path);
+//    [self.historyPath addObject:[NSValue value:&tPath withObjCType:@encode(CGPathRef)]];
+    UIBezierPath *bPath = [UIBezierPath bezierPathWithCGPath:self.path];
+    [self.historyPath addObject:bPath];
     [self updateCacheImage:NO];
     CGPathRelease(self.path);
     self.path = nil;
